@@ -1,0 +1,10 @@
+{
+  "source": {
+    "path": "somefile.properties"
+  },
+  "version": {},
+  "params": {
+    "param1": "value1",
+    "param2": "value2"
+  }
+}

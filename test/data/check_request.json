@@ -1,0 +1,10 @@
+{
+  "source": {
+    "base_url": "http://spinnaker.gate:8084/",
+    "pipeline_id": "123456",
+    "resource_name": "resource name"
+  },
+  "version": {
+    "stageid-guid": "1"
+  }
+}
