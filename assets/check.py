@@ -23,19 +23,15 @@ def process_check():
             exit(1)
         else:
             try:
-                version = request['version']
+                version = request['version']['stage_guid']
                 if version is None or len(version) == 0:
                     version = None
 
                 source = request['source']
-                baseUrl = source['baseUrl']
-                pipelineId = source['pipeline_id']
-                resourceName = source['resource_name']
 
-                # create REST call using source.baseUrl and request using stageId
                 response = requests.get(
-                    baseUrl + 'api/path',
-                    params={'pipeline_id': pipelineId, 'resource_name': resourceName}
+                    source['base_url'] + 'api/path',
+                    params={'pipeline_id': source['pipeline_id'], 'resource_name': source['resource_name']}
                 )
 
                 payload = json.loads(response.json())
@@ -43,8 +39,8 @@ def process_check():
                     version = None
                 else:
                     stage_guid = payload[0]['id']
-                    # if stage_guid
-
+                    if stage_guid is not None and stage_guid != version:
+                        version = {'stage_guid': stage_guid}
 
                 version_list = [version]
             except KeyError:
