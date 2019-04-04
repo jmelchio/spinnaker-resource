@@ -9,9 +9,8 @@ RUN chmod 755 /opt/resource/*
 
 FROM resource AS test
 COPY test /test
-RUN cd /test; set -e; for testfile in $(ls *.py); do \
-        python -m unittest $testfile; \
-    done
+COPY assets /assets
+RUN cd /; python -m unittest discover
 
 
 FROM resource
