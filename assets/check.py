@@ -11,38 +11,46 @@ def handler(signum, frame):
     exit(124)
 
 
+def call_spinnaker(source):
+    return requests.get(
+        source['base_url'] + 'api/path',
+        params={'pipeline_id': source['pipeline_id'], 'resource_name': source['resource_name']}
+    ).json()
+
+
+def capture_input():
+    with sys.stdin as standard_in:
+        request = json.load(standard_in)
+
+    return request
+
+
 def process_check():
     signal.alarm(5)
 
     try:
         try:
-            with sys.stdin as standard_in:
-                request = json.load(standard_in)
+            request = capture_input()
         except json.decoder.JSONDecodeError:
             print('No configuration provided', file=sys.stderr)
             exit(1)
         else:
             try:
-                version = request['version']['stage_guid']
-                if version is None or len(version) == 0:
+                if 'version' in request and 'stage_guid' in request['version']:
+                    version = request['version']['stage_guid']
+                else:
                     version = None
 
                 source = request['source']
 
-                response = requests.get(
-                    source['base_url'] + 'api/path',
-                    params={'pipeline_id': source['pipeline_id'], 'resource_name': source['resource_name']}
-                )
+                payload = json.loads(call_spinnaker(source))
 
-                payload = json.loads(response.json())
-                if payload is None or len(payload) == 0:
-                    version = None
-                else:
-                    stage_guid = payload[0]['id']
-                    if stage_guid is not None and stage_guid != version:
-                        version = {'stage_guid': stage_guid}
+                version_list = []
 
-                version_list = [version]
+                for item in payload:
+                    if 'id' in item and item['id'] != version:
+                        version_list.append({'stage_guid': item['id']})
+
             except KeyError:
                 version_list = []
 

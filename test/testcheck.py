@@ -1,52 +1,127 @@
-import json
-import subprocess
+from assets import check
+from io import StringIO
 import unittest
+import json
+import sys
+from unittest.mock import patch
+
+spinnaker_new_guid = '[{ "id": "testId", "parameters": { "testKey1": "testVal1", "testKey2": "testVal2" } }]'
+spinnaker_empty_response = '[]'
+spinnaker_no_id = '[{"parameters": { "testKey1": "testVal1", "testKey2": "testVal2" } }]'
+spinnaker_multiple_values = '''
+[{ "id": "testId0", "parameters": { "testKey1": "testVal0", "testKey2": "testVal1" } },
+ { "id": "testId1", "parameters": { "testKey3": "testVal2", "testKey4": "testVal3" } },
+ { "id": "testId2", "parameters": { "testKey1": "testVal4", "testKey2": "testVal5" } }]
+'''
+spinnaker_multiple_values_with_bad_value = '''
+[{ "id": "testId0", "parameters": { "testKey1": "testVal0", "testKey2": "testVal1" } },
+ { "badId": "testId1", "parameters": { "testKey3": "testVal2", "testKey4": "testVal3" } },
+ { "id": "testId2", "parameters": { "testKey1": "testVal4", "testKey2": "testVal5" } }]
+'''
+
+concourse_check_with_version = json.loads(''' { "source": 
+{ "base_url": "http://spinnaker.gate:8084/", "pipeline_id": "123456", "resource_name": "resource name"}, 
+"version": { "stage_guid": "1"}}
+'''
+                                          )
+concourse_check_without_version = json.loads(''' { "source": 
+{ "base_url": "http://spinnaker.gate:8084/", "pipeline_id": "123456", "resource_name": "resource name"}, 
+"version": {}}
+'''
+                                             )
+
+concourse_check_without_baseurl = json.loads(''' { "source": 
+                                             { "pipeline_id": "123456", "resource_name": "resource name"}, 
+                                             "version": {"stage_guid": "1"}}
+                                             '''
+                                             )
 
 
 class TestCheck(unittest.TestCase):
 
-    def test_happy_path_no_new(self):
-        with open('./data/check_request.json', 'r') as input_file:
-            completed_process = subprocess.run('/opt/resource/check', stdin=input_file, capture_output=True)
-            self.assertEqual(0, completed_process.returncode, 'process should return 0 exit')
-            result = json.loads(completed_process.stdout)
-            self.assertEqual(result[0]['spinnaker_request'], '1', 'version does not match expected value')
+    @patch('assets.check.call_spinnaker', return_value=spinnaker_new_guid)
+    @patch('assets.check.capture_input', return_value=concourse_check_with_version)
+    def test_unit_happy_path_new_version(self, call_spinnaker, capture_input):
+        backup = sys.stdout
+        sys.stdout = StringIO()
+        check.main()
+        out = sys.stdout.getvalue()
+        sys.stdout.close()
+        sys.stdout = backup
+        self.assertEqual(out, '[{"stage_guid": "testId"}]\n', 'No new version returned')
 
-    def test_happy_path_has_new(self):
-        with open('./data/check_request.json', 'r') as input_file:
-            completed_process = subprocess.run('/opt/resource/check', stdin=input_file, capture_output=True)
-            self.assertEqual(0, completed_process.returncode, 'process should return 0 exit')
-            result = json.loads(completed_process.stdout)
-            self.assertEqual(result[0]['spinnaker_request'], '2', 'version does not match expected value')
+    @patch('assets.check.call_spinnaker', return_value=spinnaker_multiple_values)
+    @patch('assets.check.capture_input', return_value=concourse_check_with_version)
+    def test_unit_happy_path_new_versions(self, call_spinnaker, capture_input):
+        backup = sys.stdout
+        sys.stdout = StringIO()
+        check.main()
+        out = sys.stdout.getvalue()
+        sys.stdout.close()
+        sys.stdout = backup
+        self.assertEqual(
+            out,
+            '[{"stage_guid": "testId0"}, {"stage_guid": "testId1"}, {"stage_guid": "testId2"}]\n',
+            'No new version returned'
+        )
 
-    def test_should_time_out(self):
-        try:
-            completed_process = subprocess.run('/opt/resource/check', check=True, capture_output=True)
-        except subprocess.CalledProcessError as cpe:
-            self.assertEqual(124, cpe.returncode, 'process should have timed out')
-        else:
-            self.assertNotEqual(0, completed_process.returncode, 'Non-zero return code expected')
+    @patch('assets.check.call_spinnaker', return_value=spinnaker_new_guid)
+    @patch('assets.check.capture_input', return_value=concourse_check_without_version)
+    def test_unit_happy_path_no_existing_version(self, call_spinnaker, capture_input):
+        backup = sys.stdout
+        sys.stdout = StringIO()
+        check.main()
+        out = sys.stdout.getvalue()
+        sys.stdout.close()
+        sys.stdout = backup
+        self.assertEqual(out, '[{"stage_guid": "testId"}]\n', 'No new version returned')
 
-    def test_should_fail_to_parse(self):
-        with open('./data/empty_file.json', 'r') as input_file:
-            completed_process = subprocess.run('/opt/resource/check', stdin=input_file, capture_output=True)
-            self.assertNotEqual(0, completed_process.returncode, 'Non-zero return code expected')
-            error_message = completed_process.stderr.decode('utf-8')
-            self.assertEqual('No configuration provided', error_message.split('\n', 1)[0], 'wrong error message')
+    @patch('assets.check.call_spinnaker', return_value=spinnaker_empty_response)
+    @patch('assets.check.capture_input', return_value=concourse_check_without_version)
+    def test_unit_happy_path_no_new_version(self, call_spinnaker, capture_input):
+        backup = sys.stdout
+        sys.stdout = StringIO()
+        check.main()
+        out = sys.stdout.getvalue()
+        sys.stdout.close()
+        sys.stdout = backup
+        self.assertEqual(out, '[]\n', 'No empty list returned')
 
-    def test_should_return_first_version(self):
-        with open('./data/check_request_no_version.json', 'r') as input_file:
-            completed_process = subprocess.run('/opt/resource/check', stdin=input_file, capture_output=True)
-            self.assertEqual(0, completed_process.returncode, 'process should return 0 exit')
-            result = json.loads(completed_process.stdout)
-            self.assertEqual(result[0]['build_id'], '0', 'version does not match expected value')
+    @patch('assets.check.call_spinnaker', return_value=spinnaker_no_id)
+    @patch('assets.check.capture_input', return_value=concourse_check_without_version)
+    def test_unit_crappy_path_missing_id(self, call_spinnaker, capture_input):
+        backup = sys.stdout
+        sys.stdout = StringIO()
+        check.main()
+        out = sys.stdout.getvalue()
+        sys.stdout.close()
+        sys.stdout = backup
+        self.assertEqual(out, '[]\n', 'No empty list returned')
 
-    def test_should_return_first_version_v2(self):
-        with open('./data/check_request_empty_version.json', 'r') as input_file:
-            completed_process = subprocess.run('/opt/resource/check', stdin=input_file, capture_output=True)
-            self.assertEqual(0, completed_process.returncode, 'process should return 0 exit')
-            result = json.loads(completed_process.stdout)
-            self.assertEqual(result[0]['build_id'], '0', 'version does not match expected value')
+    @patch('assets.check.call_spinnaker', return_value=spinnaker_multiple_values_with_bad_value)
+    @patch('assets.check.capture_input', return_value=concourse_check_with_version)
+    def test_unit_crappy_path_new_versions_bad_id(self, call_spinnaker, capture_input):
+        backup = sys.stdout
+        sys.stdout = StringIO()
+        check.main()
+        out = sys.stdout.getvalue()
+        sys.stdout.close()
+        sys.stdout = backup
+        self.assertEqual(
+            out,
+            '[{"stage_guid": "testId0"}, {"stage_guid": "testId2"}]\n',
+            'No new version returned'
+        )
+
+    @patch('assets.check.capture_input', return_value=concourse_check_without_baseurl)
+    def test_unit_crappy_path_missing_base_url(self, capture_input):
+        backup = sys.stdout
+        sys.stdout = StringIO()
+        check.main()
+        out = sys.stdout.getvalue()
+        sys.stdout.close()
+        sys.stdout = backup
+        self.assertEqual(out, '[]\n', 'No empty list returned')
 
 
 if __name__ == '__main__':
