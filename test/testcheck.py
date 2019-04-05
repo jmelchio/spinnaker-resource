@@ -30,10 +30,10 @@ spinnaker_new_guid = '''
         "stages": [
             {
                 "context": {
-                    "failPipeline": true,
-                    "instructions": "Should I complete?",
-                    "judgmentInputs": [],
-                    "notifications": []
+                    "master": "some-master",
+                    "teamName": "A-team",
+                    "pipelineName": "some-pipeline",
+                    "resourceName": "spin-resource"
                 },
                 "id": "01D7N3NNCG0GBKK28RS25R4HX4",
                 "name": "Manual Judgment",
@@ -104,10 +104,10 @@ spinnaker_no_id = '''
         "stages": [
             {
                 "context": {
-                    "failPipeline": true,
-                    "instructions": "Should I complete?",
-                    "judgmentInputs": [],
-                    "notifications": []
+                    "master": "some-master",
+                    "teamName": "A-team",
+                    "pipelineName": "some-pipeline",
+                    "resourceName": "spin-resource"
                 },
                 "name": "Manual Judgment",
                 "outputs": {},
@@ -203,12 +203,12 @@ spinnaker_multiple_values = '''
                 ],
                 "type": "manualJudgment"
             },
-                      {
+            {
                 "context": {
-                    "failPipeline": true,
-                    "instructions": "Should I complete?",
-                    "judgmentInputs": [],
-                    "notifications": []
+                    "master": "some-master",
+                    "teamName": "A-team",
+                    "pipelineName": "some-pipeline",
+                    "resourceName": "spin-resource"
                 },
                 "id": "01D7N3NNCG0GBKK28RS25R4HX4",
                 "name": "Manual Judgment",
@@ -234,36 +234,10 @@ spinnaker_multiple_values = '''
             },
             {
                 "context": {
-                    "account": "atherton",
-                    "application": "metricsdemo",
-                    "cloudProvider": "cloudfoundry",
-                    "cloudProviderType": "cloudfoundry",
-                    "credentials": "montclair",
-                    "destination": {
-                        "region": "development > development"
-                    },
-                    "freeFormDetails": "",
-                    "manifest": {
-                        "direct": {
-                            "buildpacks": [],
-                            "diskQuota": "1024M",
-                            "environment": [],
-                            "healthCheckType": "port",
-                            "instances": 1.0,
-                            "memory": "1024M",
-                            "routes": [],
-                            "services": []
-                        }
-                    },
-                    "refId": "2",
-                    "region": "development > development",
-                    "requisiteStageRefIds": [
-                        "1"
-                    ],
-                    "stack": "",
-                    "startApplication": true,
-                    "target": "current_asg_dynamic",
-                    "targetCluster": "metricsdemo"
+                    "master": "some-master",
+                    "teamName": "A-team",
+                    "pipelineName": "some-pipeline",
+                    "resourceName": "spin-resource"
                 },
                 "id": "01D7N3NNCGZ2PWFS2FKYBS2FFV",
                 "name": "Clone Server Group",
@@ -322,10 +296,10 @@ spinnaker_multiple_values_with_bad_value = '''
         "stages": [
             {
                 "context": {
-                    "failPipeline": true,
-                    "instructions": "Should I complete?",
-                    "judgmentInputs": [],
-                    "notifications": []
+                    "master": "some-master",
+                    "teamName": "A-team",
+                    "pipelineName": "some-pipeline",
+                    "resourceName": "spin-resource"
                 },
                 "badid": "01D7N3NNCG0GBKK28RS25R4HX4",
                 "name": "Manual Judgment",
@@ -349,12 +323,12 @@ spinnaker_multiple_values_with_bad_value = '''
                 ],
                 "type": "concourse"
             },
-                      {
+            {
                 "context": {
-                    "failPipeline": true,
-                    "instructions": "Should I complete?",
-                    "judgmentInputs": [],
-                    "notifications": []
+                    "master": "some-master",
+                    "teamName": "A-team",
+                    "pipelineName": "some-pipeline",
+                    "resourceName": "spin-resource"
                 },
                 "id": "01D7N3NNCG0GBKK28RS25R4HX4",
                 "name": "Manual Judgment",
@@ -380,36 +354,10 @@ spinnaker_multiple_values_with_bad_value = '''
             },
             {
                 "context": {
-                    "account": "atherton",
-                    "application": "metricsdemo",
-                    "cloudProvider": "cloudfoundry",
-                    "cloudProviderType": "cloudfoundry",
-                    "credentials": "montclair",
-                    "destination": {
-                        "region": "development > development"
-                    },
-                    "freeFormDetails": "",
-                    "manifest": {
-                        "direct": {
-                            "buildpacks": [],
-                            "diskQuota": "1024M",
-                            "environment": [],
-                            "healthCheckType": "port",
-                            "instances": 1.0,
-                            "memory": "1024M",
-                            "routes": [],
-                            "services": []
-                        }
-                    },
-                    "refId": "2",
-                    "region": "development > development",
-                    "requisiteStageRefIds": [
-                        "1"
-                    ],
-                    "stack": "",
-                    "startApplication": true,
-                    "target": "current_asg_dynamic",
-                    "targetCluster": "metricsdemo"
+                    "master": "some-master",
+                    "teamName": "A-team",
+                    "pipelineName": "some-pipeline",
+                    "resourceName": "spin-resource"
                 },
                 "id": "01D7N3NNCGZ2PWFS2FKYBS2FFV",
                 "name": "Clone Server Group",
@@ -445,11 +393,17 @@ spinnaker_multiple_values_with_bad_value = '''
 '''
 
 concourse_check_with_version = json.loads(''' { "source": 
-{ "base_url": "http://spinnaker.gate:8084/", "app_name": "metricsdemo"}, "version": { "stage_guid": "1"}} ''')
-concourse_check_without_version = json.loads(''' { "source": 
-{ "base_url": "http://spinnaker.gate:8084/", "app_name": "metricsdemo"}, "version": {}} ''')
+{ "base_url": "http://spinnaker.gate:8084/", "app_name": "metricsdemo", "master": "some-master", "team_name": "A-team",
+"pipeline_name": "some-pipeline", "resource_name": "spin-resource"}, 
+"version": { "stage_guid": "1"}} ''')
 
-concourse_check_without_baseurl = json.loads('{ "source": { "app_name": "metricsdemo"}, "version": {"stage_guid": "1"}}')
+concourse_check_without_version = json.loads(''' { "source": 
+{ "base_url": "http://spinnaker.gate:8084/", "app_name": "metricsdemo", "master": "some-master", "team_name": "A-team",
+"pipeline_name": "some-pipeline", "resource_name": "spin-resource"}, "version": {}} ''')
+
+concourse_check_without_baseurl = json.loads('''{ "source": { "app_name": "metricsdemo", "master": "some-master"
+, "team_name": "A-team", "pipeline_name": "some-pipeline", "resource_name": "spin-resource"}, 
+"version": {"stage_guid": "1"}}''')
 
 
 class TestCheck(unittest.TestCase):

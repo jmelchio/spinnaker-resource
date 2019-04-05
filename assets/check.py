@@ -42,6 +42,10 @@ def process_check():
                     version = None
 
                 source = request['source']
+                master = source['master']
+                pipeline_name = source['pipeline_name']
+                resource_name = source['resource_name']
+                team_name = source['team_name']
 
                 payload = json.loads(call_spinnaker(source))
 
@@ -52,8 +56,14 @@ def process_check():
                         if 'stages' in application:
                             for stage in application['stages']:
                                 if 'id' in stage and stage['id'] != version \
-                                        and 'type' in stage and stage['type'] == 'concourse':
-                                    version_list.append({'stage_guid': stage['id']})
+                                        and 'type' in stage and stage['type'] == 'concourse' \
+                                        and 'context' in stage:
+                                    context = stage['context']
+                                    if 'master' in context and master == context['master'] \
+                                            and 'pipelineName' in context and pipeline_name == context['pipelineName'] \
+                                            and 'resourceName' in context and resource_name == context['resourceName'] \
+                                            and 'teamName' in context and team_name == context['teamName']:
+                                        version_list.append({'stage_guid': stage['id']})
 
             except KeyError:
                 version_list = []
