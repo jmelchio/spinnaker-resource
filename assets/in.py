@@ -15,8 +15,8 @@ def handler(signum, frame):
 
 def call_spinnaker(source):
     return requests.get(
-        source['base_url'] + 'api/path',
-        params={'pipeline_id': source['pipeline_id'], 'resource_name': source['resource_name']}
+        source['base_url'] + 'applications/' + source['app_name'] + '/executions/search',
+        params={'statuses': 'RUNNING', 'expand': 'true'}
     ).json()
 
 

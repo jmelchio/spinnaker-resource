@@ -5,26 +5,451 @@ import json
 import sys
 from unittest.mock import patch
 
-spinnaker_new_guid = '[{ "id": "testId", "parameters": { "testKey1": "testVal1", "testKey2": "testVal2" } }]'
+spinnaker_new_guid = '''
+[
+    {
+        "application": "metricsdemo",
+        "authentication": {
+            "allowedAccounts": [
+                "seoul",
+                "montclair",
+                "atherton"
+            ],
+            "user": "anonymous"
+        },
+        "buildTime": 1554412918160,
+        "canceled": false,
+        "id": "01D7N3NNCGRF14VNPHMM46X19X",
+        "initialConfig": {},
+        "keepWaitingPipelines": false,
+        "limitConcurrent": true,
+        "name": "block",
+        "notifications": [],
+        "origin": "api",
+        "pipelineConfigId": "4652d7ac-e9af-41b2-b41f-a946e24354f2",
+        "stages": [
+            {
+                "context": {
+                    "failPipeline": true,
+                    "instructions": "Should I complete?",
+                    "judgmentInputs": [],
+                    "notifications": []
+                },
+                "id": "01D7N3NNCG0GBKK28RS25R4HX4",
+                "name": "Manual Judgment",
+                "outputs": {},
+                "refId": "1",
+                "requisiteStageRefIds": [],
+                "startTime": 1554412918193,
+                "status": "RUNNING",
+                "tasks": [
+                    {
+                        "id": "1",
+                        "implementingClass": "com.netflix.spinnaker.orca.echo.pipeline.ManualJudgmentStage$WaitForManualJudgmentTask",
+                        "loopEnd": false,
+                        "loopStart": false,
+                        "name": "waitForJudgment",
+                        "stageEnd": true,
+                        "stageStart": true,
+                        "startTime": 1554412918208,
+                        "status": "RUNNING"
+                    }
+                ],
+                "type": "concourse"
+            }
+        ],
+        "startTime": 1554412918173,
+        "status": "RUNNING",
+        "systemNotifications": [],
+        "trigger": {
+            "artifacts": [],
+            "dryRun": false,
+            "enabled": false,
+            "eventId": "fdc68837-d4ae-421a-817d-c9d31d532939",
+            "notifications": [],
+            "parameters": {},
+            "rebake": false,
+            "resolvedExpectedArtifacts": [],
+            "strategy": false,
+            "type": "manual",
+            "user": "anonymous"
+        },
+        "type": "PIPELINE"
+    }
+]
+'''
 spinnaker_empty_response = '[]'
-spinnaker_no_id = '[{"parameters": { "testKey1": "testVal1", "testKey2": "testVal2" } }]'
+spinnaker_no_id = '''
+[
+    {
+        "application": "metricsdemo",
+        "authentication": {
+            "allowedAccounts": [
+                "seoul",
+                "montclair",
+                "atherton"
+            ],
+            "user": "anonymous"
+        },
+        "buildTime": 1554412918160,
+        "canceled": false,
+        "id": "01D7N3NNCGRF14VNPHMM46X19X",
+        "initialConfig": {},
+        "keepWaitingPipelines": false,
+        "limitConcurrent": true,
+        "name": "block",
+        "notifications": [],
+        "origin": "api",
+        "pipelineConfigId": "4652d7ac-e9af-41b2-b41f-a946e24354f2",
+        "stages": [
+            {
+                "context": {
+                    "failPipeline": true,
+                    "instructions": "Should I complete?",
+                    "judgmentInputs": [],
+                    "notifications": []
+                },
+                "name": "Manual Judgment",
+                "outputs": {},
+                "refId": "1",
+                "requisiteStageRefIds": [],
+                "startTime": 1554412918193,
+                "status": "RUNNING",
+                "tasks": [
+                    {
+                        "id": "1",
+                        "implementingClass": "com.netflix.spinnaker.orca.echo.pipeline.ManualJudgmentStage$WaitForManualJudgmentTask",
+                        "loopEnd": false,
+                        "loopStart": false,
+                        "name": "waitForJudgment",
+                        "stageEnd": true,
+                        "stageStart": true,
+                        "startTime": 1554412918208,
+                        "status": "RUNNING"
+                    }
+                ],
+                "type": "concourse"
+            }
+        ],
+        "startTime": 1554412918173,
+        "status": "RUNNING",
+        "systemNotifications": [],
+        "trigger": {
+            "artifacts": [],
+            "dryRun": false,
+            "enabled": false,
+            "eventId": "fdc68837-d4ae-421a-817d-c9d31d532939",
+            "notifications": [],
+            "parameters": {},
+            "rebake": false,
+            "resolvedExpectedArtifacts": [],
+            "strategy": false,
+            "type": "manual",
+            "user": "anonymous"
+        },
+        "type": "PIPELINE"
+    }
+]
+'''
 spinnaker_multiple_values = '''
-[{ "id": "testId0", "parameters": { "testKey1": "testVal0", "testKey2": "testVal1" } },
- { "id": "testId1", "parameters": { "testKey3": "testVal2", "testKey4": "testVal3" } },
- { "id": "testId2", "parameters": { "testKey1": "testVal4", "testKey2": "testVal5" } }]
+[
+    {
+        "application": "metricsdemo",
+        "authentication": {
+            "allowedAccounts": [
+                "seoul",
+                "montclair",
+                "atherton"
+            ],
+            "user": "anonymous"
+        },
+        "buildTime": 1554412918160,
+        "canceled": false,
+        "id": "01D7N3NNCGRF14VNPHMM46X19X",
+        "initialConfig": {},
+        "keepWaitingPipelines": false,
+        "limitConcurrent": true,
+        "name": "block",
+        "notifications": [],
+        "origin": "api",
+        "pipelineConfigId": "4652d7ac-e9af-41b2-b41f-a946e24354f2",
+        "stages": [
+            {
+                "context": {
+                    "failPipeline": true,
+                    "instructions": "Should I complete?",
+                    "judgmentInputs": [],
+                    "notifications": []
+                },
+                "id": "01D7N3NNCG0GBKK28RS25R4HX4",
+                "name": "Manual Judgment",
+                "outputs": {},
+                "refId": "1",
+                "requisiteStageRefIds": [],
+                "startTime": 1554412918193,
+                "status": "RUNNING",
+                "tasks": [
+                    {
+                        "id": "1",
+                        "implementingClass": "com.netflix.spinnaker.orca.echo.pipeline.ManualJudgmentStage$WaitForManualJudgmentTask",
+                        "loopEnd": false,
+                        "loopStart": false,
+                        "name": "waitForJudgment",
+                        "stageEnd": true,
+                        "stageStart": true,
+                        "startTime": 1554412918208,
+                        "status": "RUNNING"
+                    }
+                ],
+                "type": "manualJudgment"
+            },
+                      {
+                "context": {
+                    "failPipeline": true,
+                    "instructions": "Should I complete?",
+                    "judgmentInputs": [],
+                    "notifications": []
+                },
+                "id": "01D7N3NNCG0GBKK28RS25R4HX4",
+                "name": "Manual Judgment",
+                "outputs": {},
+                "refId": "1",
+                "requisiteStageRefIds": [],
+                "startTime": 1554412918193,
+                "status": "RUNNING",
+                "tasks": [
+                    {
+                        "id": "1",
+                        "implementingClass": "com.netflix.spinnaker.orca.echo.pipeline.ManualJudgmentStage$WaitForManualJudgmentTask",
+                        "loopEnd": false,
+                        "loopStart": false,
+                        "name": "waitForJudgment",
+                        "stageEnd": true,
+                        "stageStart": true,
+                        "startTime": 1554412918208,
+                        "status": "RUNNING"
+                    }
+                ],
+                "type": "concourse"
+            },
+            {
+                "context": {
+                    "account": "atherton",
+                    "application": "metricsdemo",
+                    "cloudProvider": "cloudfoundry",
+                    "cloudProviderType": "cloudfoundry",
+                    "credentials": "montclair",
+                    "destination": {
+                        "region": "development > development"
+                    },
+                    "freeFormDetails": "",
+                    "manifest": {
+                        "direct": {
+                            "buildpacks": [],
+                            "diskQuota": "1024M",
+                            "environment": [],
+                            "healthCheckType": "port",
+                            "instances": 1.0,
+                            "memory": "1024M",
+                            "routes": [],
+                            "services": []
+                        }
+                    },
+                    "refId": "2",
+                    "region": "development > development",
+                    "requisiteStageRefIds": [
+                        "1"
+                    ],
+                    "stack": "",
+                    "startApplication": true,
+                    "target": "current_asg_dynamic",
+                    "targetCluster": "metricsdemo"
+                },
+                "id": "01D7N3NNCGZ2PWFS2FKYBS2FFV",
+                "name": "Clone Server Group",
+                "outputs": {},
+                "refId": "2",
+                "requisiteStageRefIds": [
+                    "1"
+                ],
+                "status": "NOT_STARTED",
+                "tasks": [],
+                "type": "concourse"
+            }
+        ],
+        "startTime": 1554412918173,
+        "status": "RUNNING",
+        "systemNotifications": [],
+        "trigger": {
+            "artifacts": [],
+            "dryRun": false,
+            "enabled": false,
+            "eventId": "fdc68837-d4ae-421a-817d-c9d31d532939",
+            "notifications": [],
+            "parameters": {},
+            "rebake": false,
+            "resolvedExpectedArtifacts": [],
+            "strategy": false,
+            "type": "manual",
+            "user": "anonymous"
+        },
+        "type": "PIPELINE"
+    }
+]
 '''
 spinnaker_multiple_values_with_bad_value = '''
-[{ "id": "testId0", "parameters": { "testKey1": "testVal0", "testKey2": "testVal1" } },
- { "badId": "testId1", "parameters": { "testKey3": "testVal2", "testKey4": "testVal3" } },
- { "id": "testId2", "parameters": { "testKey1": "testVal4", "testKey2": "testVal5" } }]
+[
+    {
+        "application": "metricsdemo",
+        "authentication": {
+            "allowedAccounts": [
+                "seoul",
+                "montclair",
+                "atherton"
+            ],
+            "user": "anonymous"
+        },
+        "buildTime": 1554412918160,
+        "canceled": false,
+        "id": "01D7N3NNCGRF14VNPHMM46X19X",
+        "initialConfig": {},
+        "keepWaitingPipelines": false,
+        "limitConcurrent": true,
+        "name": "block",
+        "notifications": [],
+        "origin": "api",
+        "pipelineConfigId": "4652d7ac-e9af-41b2-b41f-a946e24354f2",
+        "stages": [
+            {
+                "context": {
+                    "failPipeline": true,
+                    "instructions": "Should I complete?",
+                    "judgmentInputs": [],
+                    "notifications": []
+                },
+                "badid": "01D7N3NNCG0GBKK28RS25R4HX4",
+                "name": "Manual Judgment",
+                "outputs": {},
+                "refId": "1",
+                "requisiteStageRefIds": [],
+                "startTime": 1554412918193,
+                "status": "RUNNING",
+                "tasks": [
+                    {
+                        "id": "1",
+                        "implementingClass": "com.netflix.spinnaker.orca.echo.pipeline.ManualJudgmentStage$WaitForManualJudgmentTask",
+                        "loopEnd": false,
+                        "loopStart": false,
+                        "name": "waitForJudgment",
+                        "stageEnd": true,
+                        "stageStart": true,
+                        "startTime": 1554412918208,
+                        "status": "RUNNING"
+                    }
+                ],
+                "type": "concourse"
+            },
+                      {
+                "context": {
+                    "failPipeline": true,
+                    "instructions": "Should I complete?",
+                    "judgmentInputs": [],
+                    "notifications": []
+                },
+                "id": "01D7N3NNCG0GBKK28RS25R4HX4",
+                "name": "Manual Judgment",
+                "outputs": {},
+                "refId": "1",
+                "requisiteStageRefIds": [],
+                "startTime": 1554412918193,
+                "status": "RUNNING",
+                "tasks": [
+                    {
+                        "id": "1",
+                        "implementingClass": "com.netflix.spinnaker.orca.echo.pipeline.ManualJudgmentStage$WaitForManualJudgmentTask",
+                        "loopEnd": false,
+                        "loopStart": false,
+                        "name": "waitForJudgment",
+                        "stageEnd": true,
+                        "stageStart": true,
+                        "startTime": 1554412918208,
+                        "status": "RUNNING"
+                    }
+                ],
+                "type": "concourse"
+            },
+            {
+                "context": {
+                    "account": "atherton",
+                    "application": "metricsdemo",
+                    "cloudProvider": "cloudfoundry",
+                    "cloudProviderType": "cloudfoundry",
+                    "credentials": "montclair",
+                    "destination": {
+                        "region": "development > development"
+                    },
+                    "freeFormDetails": "",
+                    "manifest": {
+                        "direct": {
+                            "buildpacks": [],
+                            "diskQuota": "1024M",
+                            "environment": [],
+                            "healthCheckType": "port",
+                            "instances": 1.0,
+                            "memory": "1024M",
+                            "routes": [],
+                            "services": []
+                        }
+                    },
+                    "refId": "2",
+                    "region": "development > development",
+                    "requisiteStageRefIds": [
+                        "1"
+                    ],
+                    "stack": "",
+                    "startApplication": true,
+                    "target": "current_asg_dynamic",
+                    "targetCluster": "metricsdemo"
+                },
+                "id": "01D7N3NNCGZ2PWFS2FKYBS2FFV",
+                "name": "Clone Server Group",
+                "outputs": {},
+                "refId": "2",
+                "requisiteStageRefIds": [
+                    "1"
+                ],
+                "status": "NOT_STARTED",
+                "tasks": [],
+                "type": "concourse"
+            }
+        ],
+        "startTime": 1554412918173,
+        "status": "RUNNING",
+        "systemNotifications": [],
+        "trigger": {
+            "artifacts": [],
+            "dryRun": false,
+            "enabled": false,
+            "eventId": "fdc68837-d4ae-421a-817d-c9d31d532939",
+            "notifications": [],
+            "parameters": {},
+            "rebake": false,
+            "resolvedExpectedArtifacts": [],
+            "strategy": false,
+            "type": "manual",
+            "user": "anonymous"
+        },
+        "type": "PIPELINE"
+    }
+]
 '''
 
 concourse_check_with_version = json.loads(''' { "source": 
-{ "base_url": "http://spinnaker.gate:8084/", "app_name": "demo345"}, "version": { "stage_guid": "1"}} ''')
+{ "base_url": "http://spinnaker.gate:8084/", "app_name": "metricsdemo"}, "version": { "stage_guid": "1"}} ''')
 concourse_check_without_version = json.loads(''' { "source": 
-{ "base_url": "http://spinnaker.gate:8084/", "app_name": "demo345"}, "version": {}} ''')
+{ "base_url": "http://spinnaker.gate:8084/", "app_name": "metricsdemo"}, "version": {}} ''')
 
-concourse_check_without_baseurl = json.loads('{ "source": { "app_name": "demo345"}, "version": {"stage_guid": "1"}}')
+concourse_check_without_baseurl = json.loads('{ "source": { "app_name": "metricsdemo"}, "version": {"stage_guid": "1"}}')
 
 
 class TestCheck(unittest.TestCase):
@@ -38,7 +463,7 @@ class TestCheck(unittest.TestCase):
         out = sys.stdout.getvalue()
         sys.stdout.close()
         sys.stdout = backup
-        self.assertEqual(out, '[{"stage_guid": "testId"}]\n', 'No new version returned')
+        self.assertEqual(out, '[{"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}]\n', 'No new version returned')
 
     @patch('assets.check.call_spinnaker', return_value=spinnaker_multiple_values)
     @patch('assets.check.capture_input', return_value=concourse_check_with_version)
@@ -51,7 +476,7 @@ class TestCheck(unittest.TestCase):
         sys.stdout = backup
         self.assertEqual(
             out,
-            '[{"stage_guid": "testId0"}, {"stage_guid": "testId1"}, {"stage_guid": "testId2"}]\n',
+            '[{"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}, {"stage_guid": "01D7N3NNCGZ2PWFS2FKYBS2FFV"}]\n',
             'No new version returned'
         )
 
@@ -64,7 +489,7 @@ class TestCheck(unittest.TestCase):
         out = sys.stdout.getvalue()
         sys.stdout.close()
         sys.stdout = backup
-        self.assertEqual(out, '[{"stage_guid": "testId"}]\n', 'No new version returned')
+        self.assertEqual(out, '[{"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}]\n', 'No new version returned')
 
     @patch('assets.check.call_spinnaker', return_value=spinnaker_empty_response)
     @patch('assets.check.capture_input', return_value=concourse_check_without_version)
@@ -99,7 +524,7 @@ class TestCheck(unittest.TestCase):
         sys.stdout = backup
         self.assertEqual(
             out,
-            '[{"stage_guid": "testId0"}, {"stage_guid": "testId2"}]\n',
+            '[{"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}, {"stage_guid": "01D7N3NNCGZ2PWFS2FKYBS2FFV"}]\n',
             'No new version returned'
         )
 

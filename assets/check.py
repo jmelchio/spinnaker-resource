@@ -47,9 +47,13 @@ def process_check():
 
                 version_list = []
 
-                for item in payload:
-                    if 'id' in item and item['id'] != version:
-                        version_list.append({'stage_guid': item['id']})
+                for application in payload:
+                    if 'application' in application and application['application'] == source['app_name']:
+                        if 'stages' in application:
+                            for stage in application['stages']:
+                                if 'id' in stage and stage['id'] != version \
+                                        and 'type' in stage and stage['type'] == 'concourse':
+                                    version_list.append({'stage_guid': stage['id']})
 
             except KeyError:
                 version_list = []
