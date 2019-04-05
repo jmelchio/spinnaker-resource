@@ -20,21 +20,11 @@ spinnaker_multiple_values_with_bad_value = '''
 '''
 
 concourse_check_with_version = json.loads(''' { "source": 
-{ "base_url": "http://spinnaker.gate:8084/", "pipeline_id": "123456", "resource_name": "resource name"}, 
-"version": { "stage_guid": "1"}}
-'''
-                                          )
+{ "base_url": "http://spinnaker.gate:8084/", "app_name": "demo345"}, "version": { "stage_guid": "1"}} ''')
 concourse_check_without_version = json.loads(''' { "source": 
-{ "base_url": "http://spinnaker.gate:8084/", "pipeline_id": "123456", "resource_name": "resource name"}, 
-"version": {}}
-'''
-                                             )
+{ "base_url": "http://spinnaker.gate:8084/", "app_name": "demo345"}, "version": {}} ''')
 
-concourse_check_without_baseurl = json.loads(''' { "source": 
-                                             { "pipeline_id": "123456", "resource_name": "resource name"}, 
-                                             "version": {"stage_guid": "1"}}
-                                             '''
-                                             )
+concourse_check_without_baseurl = json.loads('{ "source": { "app_name": "demo345"}, "version": {"stage_guid": "1"}}')
 
 
 class TestCheck(unittest.TestCase):
