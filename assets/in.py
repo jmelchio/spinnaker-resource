@@ -10,7 +10,7 @@ import requests
 
 def handler(signum, frame):
     print('Operation Timed Out', file=sys.stderr)
-    exit(1)
+    exit(signum)
 
 
 def call_spinnaker(source):

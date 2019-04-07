@@ -1,3 +1,5 @@
+import subprocess
+
 from assets import check
 from io import StringIO
 import unittest
@@ -491,6 +493,14 @@ class TestCheck(unittest.TestCase):
         sys.stdout.close()
         sys.stdout = backup
         self.assertEqual(out, '[]\n', 'No empty list returned')
+
+    def test_unit_crappy_path_timeout(self):
+        try:
+            completed_process = subprocess.run('assets/check.py', check=True, capture_output=True)
+        except subprocess.CalledProcessError as cpe:
+            self.assertEqual(1, cpe.returncode, 'process should have timed out')
+        else:
+            self.assertNotEqual(0, completed_process.returncode, 'Non-zero return code expected')
 
 
 if __name__ == '__main__':

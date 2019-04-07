@@ -8,7 +8,7 @@ import sys
 
 def handler(signum, frame):
     print('Operation Timed Out', file=sys.stderr)
-    exit(1)
+    exit(signum)
 
 
 def process_out(directory=None):
@@ -46,9 +46,9 @@ def process_out(directory=None):
                 }
                 print(json.dumps(response))
 
-    except SystemExit:
+    except SystemExit as sysex:
         print('System Exit detected', file=sys.stderr)
-        exit(124)
+        exit(sysex.code)
 
 
 def main(argv=None):

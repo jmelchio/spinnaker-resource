@@ -8,7 +8,7 @@ import sys
 
 def handler(signum, frame):
     print('Operation Timed Out', file=sys.stderr)
-    exit(124)
+    exit(signum)
 
 
 def call_spinnaker(source):
@@ -70,9 +70,9 @@ def process_check():
 
             print(json.dumps(version_list))
 
-    except SystemExit:
-        print('System Exit detected', file=sys.stderr)
-        exit(124)
+    except SystemExit as sysex:
+        print('System Exit detected: ' + str(sysex.code), file=sys.stderr)
+        exit(1)
 
 
 def main():
