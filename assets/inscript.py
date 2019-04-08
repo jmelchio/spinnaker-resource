@@ -36,7 +36,7 @@ def capture_input():
 
 def write_configuration(directory, source, configuration):
     with open(os.path.join(directory, source['path']), 'w') as config_file:
-        for key, value in configuration:
+        for key, value in configuration.items():
             config_file.write(key + '=' + value + '\n')
 
 
@@ -82,7 +82,7 @@ def process_in(directory=None):
                                             if 'status' in task and task['status'] == 'RUNNING' \
                                                     and 'name' in task \
                                                     and task['name'] == 'waitForConcourseJobStartTask':
-                                                if context['parameters']:
+                                                if 'parameters' in context:
                                                     configuration = context['parameters']
                                                 else:
                                                     configuration = {}
@@ -90,7 +90,7 @@ def process_in(directory=None):
                                                 write_configuration(directory, source, configuration)
                                                 output['version'] = {'stage_guid': version}
                                                 output['metadata'] = []
-                                                for key, value in configuration:
+                                                for key, value in configuration.items():
                                                     output['metadata'].append({'name': key, 'value': value})
 
                                                 if not notify_spinnaker(source, output):
@@ -108,17 +108,20 @@ def process_in(directory=None):
         exit(124)
 
 
-def main(argv=None):
-    if argv is None:
-        argv = sys.argv
-
-    if len(argv) < 2:
-        print('Usage: %s PATH' % argv[0], file=sys.stderr)
-        exit(1)
+def main(*args):
+    directory = None
+    if len(args) is 0:
+        if len(sys.argv) < 2:
+            print('Usage: %s PATH' % sys.argv[0], file=sys.stderr)
+            exit(1)
+        else:
+            directory = sys.argv[1]
+    else:
+        directory = args[0]
 
     signal.signal(signal.SIGALRM, handler)
 
-    process_in(argv[1])
+    process_in(directory)
 
 
 if __name__ == '__main__':
