@@ -72,22 +72,30 @@ def process_in(directory=None):
                             for stage in application['stages']:
                                 if 'id' in stage and stage['id'] == version \
                                         and 'type' in stage and stage['type'] == 'concourse' \
-                                        and 'context' in stage:
+                                        and 'context' in stage and 'tasks' in stage:
                                     context = stage['context']
                                     if 'master' in context and master == context['master'] \
                                             and 'pipelineName' in context and pipeline_name == context['pipelineName'] \
                                             and 'resourceName' in context and resource_name == context['resourceName'] \
                                             and 'teamName' in context and team_name == context['teamName']:
-                                        configuration = context['parameters']
-                                        write_configuration(directory, source, configuration)
-                                        output['version'] = {'stage_guid': version}
-                                        output['metadata'] = []
-                                        for key, value in configuration:
-                                            output['metadata'].append({'name': key, 'value': value})
+                                        for task in stage['tasks']:
+                                            if 'status' in task and task['status'] == 'RUNNING' \
+                                                    and 'name' in task \
+                                                    and task['name'] == 'waitForConcourseJobStartTask':
+                                                if context['parameters']:
+                                                    configuration = context['parameters']
+                                                else:
+                                                    configuration = {}
 
-                                        if not notify_spinnaker(source, output):
-                                            print('Failed to notify spinnaker', file=sys.stderr)
-                                            exit(1)
+                                                write_configuration(directory, source, configuration)
+                                                output['version'] = {'stage_guid': version}
+                                                output['metadata'] = []
+                                                for key, value in configuration:
+                                                    output['metadata'].append({'name': key, 'value': value})
+
+                                                if not notify_spinnaker(source, output):
+                                                    print('Failed to notify spinnaker', file=sys.stderr)
+                                                    exit(1)
 
             except KeyError as kerr:
                 print('Unable to complete operation: ' + str(kerr) + '\n', file=sys.stderr)
