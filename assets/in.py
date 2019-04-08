@@ -21,7 +21,7 @@ def call_spinnaker(source):
 
 
 def notify_spinnaker(source, output):
-    return requests.get(
+    return requests.post(
         source['base_url'] + 'concourse/stage/execution',
         params={'stageId': output['stage_guid'], 'job': output['job_name'], 'buildNumber': output['build_name']}
     ).ok

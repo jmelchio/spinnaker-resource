@@ -57,13 +57,17 @@ def process_check():
                             for stage in application['stages']:
                                 if 'id' in stage and stage['id'] != version \
                                         and 'type' in stage and stage['type'] == 'concourse' \
-                                        and 'context' in stage:
+                                        and 'context' in stage and 'tasks' in stage:
                                     context = stage['context']
                                     if 'master' in context and master == context['master'] \
                                             and 'pipelineName' in context and pipeline_name == context['pipelineName'] \
                                             and 'resourceName' in context and resource_name == context['resourceName'] \
                                             and 'teamName' in context and team_name == context['teamName']:
-                                        version_list.append({'stage_guid': stage['id']})
+                                        for task in stage['tasks']:
+                                            if 'status' in task and task['status'] == 'RUNNING' \
+                                                    and 'name' in task \
+                                                    and task['name'] == 'waitForConcourseJobStartTask':
+                                                version_list.append({'stage_guid': stage['id']})
 
             except KeyError:
                 version_list = []
