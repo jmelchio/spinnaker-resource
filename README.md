@@ -14,22 +14,22 @@ configured as a trigger on the job it serves as input to in order to work proper
 should not be configured at this time.
 
 ## Parameters
-* base_url - URI that points to your *GATE* endpoint on your Spinnaker installation. **Must** include the final `/` so
+* **base_url** - URI that points to your *GATE* endpoint on your Spinnaker installation. **Must** include the final `/` so
 that is looks like `http://spin.gate:8084/`.
-* user_name - User name for basic auth connection to Spinnaker.
-* password - Password for basic auth connection to Spinnaker.
-* app_name - Name of the Spinnaker application this applies to. This is used for querying Spinnaker for pipeline 
+* user_name (*optional*) - User name for basic auth connection to Spinnaker.
+* password (*optional*) - Password for basic auth connection to Spinnaker.
+* **app_name** - Name of the Spinnaker application this applies to. This is used for querying Spinnaker for pipeline 
 executions.
 * master (*optional*) - Name of the Concourse connection defined in Spinnaker. If only one connection is defined in the
 Spinnaker setup this can be omitted. Otherwise it will be used to query Spinnaker for pipeline executions.
-* team_name - Team name of the Concourse team for the pipeline that Spinnaker connects to. This should match the name of 
+* **team_name** - Team name of the Concourse team for the pipeline that Spinnaker connects to. This should match the name of 
 the `team` in Concourse that owns the Concourse pipeline that is targeted from Spinnaker. Used to query Spinnaker for 
 pipeline executions.
-* pipeline_name - Name of the Concourse pipeline that Spinnaker connects to. This should match the name of the pipeline
+* **pipeline_name** - Name of the Concourse pipeline that Spinnaker connects to. This should match the name of the pipeline
 in Concourse as used in the `fly` command when launching the pipeline. Used to query Spinnaker for pipeline executions.
-* resource_name - Name of the resource set up to connect Concourse and Spinnaker. This should match the name of the 
+* **resource_name** - Name of the resource set up to connect Concourse and Spinnaker. This should match the name of the 
 `spinnaker-resource` in the Concourse `pipeline.yml` file. Used to query Spinnaker for pipeline executions.
-* path - name of the file that is written for any input parameters the Spinnaker configuration may provide to the 
+* **path** - name of the file that is written for any input parameters the Spinnaker configuration may provide to the 
 Concourse job in its context. This will end up in the mounted `input` volume on the task container.
 
 ## Sample configurations
