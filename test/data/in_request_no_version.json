@@ -1,9 +1,0 @@
-{
-  "source": {
-    "path": "somefile.properties"
-  },
-  "params": {
-    "param1": "value1",
-    "param2": "value2"
-  }
-}
