@@ -1,11 +1,10 @@
-import subprocess
-
-from assets import check
-from io import StringIO
-import unittest
 import json
 import sys
+import unittest
+from io import StringIO
 from unittest.mock import patch
+
+from assets import check
 
 spinnaker_new_guid = '''
 [
@@ -430,11 +429,7 @@ class TestCheck(unittest.TestCase):
         out = sys.stdout.getvalue()
         sys.stdout.close()
         sys.stdout = backup
-        self.assertEqual(
-            out,
-            '[{"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}]\n',
-            'No new version returned'
-        )
+        self.assertEqual(out, '[{"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}]\n', 'No new version returned')
 
     @patch('assets.check.call_spinnaker', return_value=spinnaker_new_guid)
     @patch('assets.check.capture_input', return_value=concourse_check_without_version)
@@ -478,11 +473,7 @@ class TestCheck(unittest.TestCase):
         out = sys.stdout.getvalue()
         sys.stdout.close()
         sys.stdout = backup
-        self.assertEqual(
-            out,
-            '[{"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}]\n',
-            'No new version returned'
-        )
+        self.assertEqual(out, '[{"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}]\n', 'No new version returned')
 
     @patch('assets.check.capture_input', return_value=concourse_check_without_baseurl)
     def test_unit_crappy_path_missing_base_url(self, capture_input):
@@ -494,14 +485,20 @@ class TestCheck(unittest.TestCase):
         sys.stdout = backup
         self.assertEqual(out, '[]\n', 'No empty list returned')
 
+
+class TestTimeOut(unittest.TestCase):
+
     def test_unit_crappy_path_timeout(self):
-        self.skipTest('Does not work in Python 3.6')
-        try:
-            completed_process = subprocess.run('assets/check.py', check=True, capture_output=True)
-        except subprocess.CalledProcessError as cpe:
-            self.assertEqual(1, cpe.returncode, 'process should have timed out')
-        else:
-            self.assertNotEqual(0, completed_process.returncode, 'Non-zero return code expected')
+        backup = sys.stderr
+        sys.stderr = StringIO()
+
+        with self.assertRaises(SystemExit) as context:
+            check.main()
+
+        err = sys.stderr.getvalue()
+        sys.stderr.close()
+        sys.stderr = backup
+        self.assertEqual(str(context.exception), '1', 'Return code of `1` expected')
 
 
 if __name__ == '__main__':

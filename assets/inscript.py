@@ -98,14 +98,18 @@ def process_in(directory=None):
                                                     exit(1)
 
             except KeyError as kerr:
-                print('Unable to complete operation: ' + str(kerr) + '\n', file=sys.stderr)
+                print('Unable to complete operation: ' + str(kerr), file=sys.stderr)
                 exit(1)
             else:
+                if len(output) == 0:
+                    print('No running Wait for Concourse task found', file=sys.stderr)
+                    exit(1)
+
                 print(json.dumps(output))
 
     except SystemExit:
         print('System Exit detected', file=sys.stderr)
-        exit(124)
+        exit(1)
 
 
 def main(*args):

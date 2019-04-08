@@ -74,8 +74,8 @@ def process_check():
 
             print(json.dumps(version_list))
 
-    except SystemExit as sysex:
-        print('System Exit detected: ' + str(sysex.code), file=sys.stderr)
+    except SystemExit:
+        print('System Exit detected', file=sys.stderr)
         exit(1)
 
 

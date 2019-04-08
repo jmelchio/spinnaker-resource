@@ -10,7 +10,10 @@ RUN chmod 755 /opt/resource/*
 FROM resource AS test
 COPY ./test /test
 COPY ./assets /assets
-RUN cd /; python -m unittest discover
-
+RUN cd /; set -e; \
+          python -m unittest test.testin.TestTimeOut; \
+          python -m unittest test.testin.TestIn; \
+          python -m unittest test.testcheck.TestTimeOut; \
+          python -m unittest test.testcheck.TestCheck
 
 FROM resource
