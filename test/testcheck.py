@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 from assets import check
 
-spinnaker_new_guid = '''
+spinnaker_new_guid = json.loads('''
 [
     {
         "application": "metricsdemo",
@@ -78,9 +78,9 @@ spinnaker_new_guid = '''
         "type": "PIPELINE"
     }
 ]
-'''
-spinnaker_empty_response = '[]'
-spinnaker_no_id = '''
+''')
+spinnaker_empty_response = json.loads('[]')
+spinnaker_no_id = json.loads('''
 [
     {
         "application": "metricsdemo",
@@ -151,8 +151,8 @@ spinnaker_no_id = '''
         "type": "PIPELINE"
     }
 ]
-'''
-spinnaker_multiple_values = '''
+''')
+spinnaker_multiple_values = json.loads('''
 [
     {
         "application": "metricsdemo",
@@ -271,8 +271,8 @@ spinnaker_multiple_values = '''
         "type": "PIPELINE"
     }
 ]
-'''
-spinnaker_multiple_values_with_bad_value = '''
+''')
+spinnaker_multiple_values_with_bad_value = json.loads('''
 [
     {
         "application": "metricsdemo",
@@ -391,7 +391,7 @@ spinnaker_multiple_values_with_bad_value = '''
         "type": "PIPELINE"
     }
 ]
-'''
+''')
 
 concourse_check_with_version = json.loads(''' { "source": 
 { "base_url": "http://spinnaker.gate:8084/", "app_name": "metricsdemo", "master": "some-master", "team_name": "A-team",

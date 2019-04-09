@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from assets import inscript
 
-spinnaker_waitforconcourse_running = '''
+spinnaker_waitforconcourse_running = json.loads('''
 [
     {
         "application": "metricsdemo",
@@ -83,9 +83,9 @@ spinnaker_waitforconcourse_running = '''
         "type": "PIPELINE"
     }
 ]
-'''
+''')
 
-spinnaker_waitforconcourse_completed = '''
+spinnaker_waitforconcourse_completed = json.loads('''
 [
     {
         "application": "metricsdemo",
@@ -161,9 +161,9 @@ spinnaker_waitforconcourse_completed = '''
         "type": "PIPELINE"
     }
 ]
-'''
+''')
 
-spinnaker_multiple_values = '''
+spinnaker_multiple_values = json.loads('''
 [
     {
         "application": "metricsdemo",
@@ -282,7 +282,7 @@ spinnaker_multiple_values = '''
         "type": "PIPELINE"
     }
 ]
-'''
+''')
 
 concourse_in_match_version = json.loads(''' { "source": 
 { "base_url": "http://spinnaker.gate:8084/", "app_name": "metricsdemo", "master": "some-master", "team_name": "A-team",

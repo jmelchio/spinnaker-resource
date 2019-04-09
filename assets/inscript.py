@@ -76,7 +76,7 @@ def process_in(directory=None):
                 resource_name = source['resource_name']
                 team_name = source['team_name']
 
-                payload = json.loads(call_spinnaker(source))
+                payload = call_spinnaker(source)
 
                 output = {}
 
