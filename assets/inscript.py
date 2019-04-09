@@ -51,7 +51,7 @@ def process_in(directory=None):
             exit(1)
         else:
             try:
-                if 'version' in request and 'stage_guid' in request['version']:
+                if 'version' in request and request['version'] is not None and 'stage_guid' in request['version']:
                     version = request['version']['stage_guid']
                 else:
                     version = None

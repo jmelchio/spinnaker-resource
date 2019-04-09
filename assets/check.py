@@ -36,13 +36,16 @@ def process_check():
             exit(1)
         else:
             try:
-                if 'version' in request and 'stage_guid' in request['version']:
+                if 'version' in request and request['version'] is not None and 'stage_guid' in request['version']:
                     version = request['version']['stage_guid']
                 else:
                     version = None
 
                 source = request['source']
-                master = source['master']
+                if 'master' in source:
+                    master = source['master']
+                else:
+                    master = None
                 pipeline_name = source['pipeline_name']
                 resource_name = source['resource_name']
                 team_name = source['team_name']

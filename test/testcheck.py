@@ -402,6 +402,10 @@ concourse_check_without_version = json.loads(''' { "source":
 { "base_url": "http://spinnaker.gate:8084/", "app_name": "metricsdemo", "master": "some-master", "team_name": "A-team",
 "pipeline_name": "some-pipeline", "resource_name": "spin-resource"}, "version": {}} ''')
 
+concourse_check_no_version = json.loads(''' { "source":
+{ "base_url": "http://spinnaker.gate:8084/", "app_name": "metricsdemo", "master": "some-master", "team_name": "A-team",
+"pipeline_name": "some-pipeline", "resource_name": "spin-resource"}} ''')
+
 concourse_check_without_baseurl = json.loads('''{ "source": { "app_name": "metricsdemo", "master": "some-master"
 , "team_name": "A-team", "pipeline_name": "some-pipeline", "resource_name": "spin-resource"}, 
 "version": {"stage_guid": "1"}}''')
@@ -434,6 +438,17 @@ class TestCheck(unittest.TestCase):
     @patch('assets.check.call_spinnaker', return_value=spinnaker_new_guid)
     @patch('assets.check.capture_input', return_value=concourse_check_without_version)
     def test_unit_happy_path_no_existing_version(self, call_spinnaker, capture_input):
+        backup = sys.stdout
+        sys.stdout = StringIO()
+        check.main()
+        out = sys.stdout.getvalue()
+        sys.stdout.close()
+        sys.stdout = backup
+        self.assertEqual(out, '[{"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}]\n', 'No new version returned')
+
+    @patch('assets.check.call_spinnaker', return_value=spinnaker_new_guid)
+    @patch('assets.check.capture_input', return_value=concourse_check_no_version)
+    def test_unit_happy_path_void_existing_version(self, call_spinnaker, capture_input):
         backup = sys.stdout
         sys.stdout = StringIO()
         check.main()
