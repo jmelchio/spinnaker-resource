@@ -317,8 +317,9 @@ class TestIn(unittest.TestCase):
         sys.stdout.close()
         sys.stdout = backup
         self.assertEqual(out,
-                         '{"version": {"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}, \
-"metadata": [{"name": "thing_one", "value": "one"}, {"name": "thing_two", "value": "two"}]}\n',
+                         '{"version": {"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}, "job_name": "job-unknown", \
+"build_name": "build-number-name", "metadata": [{"name": "thing_one", "value": "one"}, \
+{"name": "thing_two", "value": "two"}]}\n',
                          'Wrong information returned from in script')
         self.assertTrue(os.path.isfile('/tmp/file.props'), 'File does not exist.')
         with open('/tmp/file.props', 'r') as config_file:
@@ -337,8 +338,8 @@ class TestIn(unittest.TestCase):
         sys.stdout.close()
         sys.stdout = backup
         self.assertEqual(out,
-                         '{"version": {"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}, "metadata": []}\n',
-                         'Wrong information returned from in script')
+                         '{"version": {"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}, "job_name": "job-unknown", \
+"build_name": "build-number-name", "metadata": []}\n', 'Wrong information returned from in script')
         self.assertTrue(os.path.isfile('/tmp/file_two.props'), 'File does not exist.')
         with open('/tmp/file_two.props', 'r') as config_file:
             contents = config_file.read()

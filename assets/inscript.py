@@ -31,13 +31,17 @@ def notify_spinnaker(source, output):
     if 'user_name' in source and 'password' in source:
         return requests.post(
             source['base_url'] + 'concourse/stage/start',
-            params={'stageId': output['stage_guid'], 'job': output['job_name'], 'buildNumber': output['build_name']},
+            params={'stageId': output['version']['stage_guid']
+                , 'job': output['job_name']
+                , 'buildNumber': output['build_name']},
             auth=(source['user_name'], source['password'])
         ).ok
     else:
         return requests.post(
             source['base_url'] + 'concourse/stage/start',
-            params={'stageId': output['stage_guid'], 'job': output['job_name'], 'buildNumber': output['build_name']}
+            params={'stageId': output['version']['stage_guid']
+                , 'job': output['job_name']
+                , 'buildNumber': output['build_name']}
         ).ok
 
 
@@ -55,7 +59,7 @@ def write_configuration(directory, source, configuration):
 
 
 def process_in(directory=None):
-    signal.alarm(5)
+    signal.alarm(20)
 
     try:
         try:
@@ -103,6 +107,8 @@ def process_in(directory=None):
 
                                                 write_configuration(directory, source, configuration)
                                                 output['version'] = {'stage_guid': version}
+                                                output['job_name'] = os.environ.get('BUILD_JOB_NAME', 'job-unknown')
+                                                output['build_name'] = os.environ.get('BUILD_NAME', 'build-number-name')
                                                 output['metadata'] = []
                                                 for key, value in configuration.items():
                                                     output['metadata'].append({'name': key, 'value': value})
