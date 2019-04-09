@@ -30,13 +30,13 @@ def call_spinnaker(source):
 def notify_spinnaker(source, output):
     if 'user_name' in source and 'password' in source:
         return requests.post(
-            source['base_url'] + 'concourse/stage/execution',
+            source['base_url'] + 'concourse/stage/start',
             params={'stageId': output['stage_guid'], 'job': output['job_name'], 'buildNumber': output['build_name']},
             auth=(source['user_name'], source['password'])
         ).ok
     else:
         return requests.post(
-            source['base_url'] + 'concourse/stage/execution',
+            source['base_url'] + 'concourse/stage/start',
             params={'stageId': output['stage_guid'], 'job': output['job_name'], 'buildNumber': output['build_name']}
         ).ok
 
