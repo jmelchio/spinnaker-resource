@@ -12,10 +12,17 @@ def handler(signum, frame):
 
 
 def call_spinnaker(source):
-    return requests.get(
-        source['base_url'] + 'applications/' + source['app_name'] + '/executions/search',
-        params={'statuses': 'RUNNING', 'expand': 'true'}
-    ).json()
+    if 'user_name' in source and 'password' in source:
+        return requests.get(
+            source['base_url'] + 'applications/' + source['app_name'] + '/executions/search',
+            params={'statuses': 'RUNNING', 'expand': 'true'},
+            auth=(source['user_name'], source['password'])
+        ).json()
+    else:
+        return requests.get(
+            source['base_url'] + 'applications/' + source['app_name'] + '/executions/search',
+            params={'statuses': 'RUNNING', 'expand': 'true'}
+        ).json()
 
 
 def capture_input():
