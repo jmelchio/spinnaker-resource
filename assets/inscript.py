@@ -7,49 +7,25 @@ import sys
 
 import requests
 
-
-def handler(signum, frame):
-    print('Operation Timed Out', file=sys.stderr)
-    exit(signum)
-
-
-def call_spinnaker(source):
-    if 'user_name' in source and 'password' in source:
-        return requests.get(
-            source['base_url'] + 'applications/' + source['app_name'] + '/executions/search',
-            params={'statuses': 'RUNNING', 'expand': 'true'},
-            auth=(source['user_name'], source['password'])
-        ).json()
-    else:
-        return requests.get(
-            source['base_url'] + 'applications/' + source['app_name'] + '/executions/search',
-            params={'statuses': 'RUNNING', 'expand': 'true'}
-        ).json()
+from assets import common
 
 
 def notify_spinnaker(source, output):
     if 'user_name' in source and 'password' in source:
         return requests.post(
             source['base_url'] + 'concourse/stage/start',
-            params={'stageId': output['version']['stage_guid']
-                , 'job': output['job_name']
-                , 'buildNumber': output['build_name']},
+            params={'stageId': output['version']['stage_guid'],
+                    'job': output['job_name'],
+                    'buildNumber': output['build_name']},
             auth=(source['user_name'], source['password'])
         ).ok
     else:
         return requests.post(
             source['base_url'] + 'concourse/stage/start',
-            params={'stageId': output['version']['stage_guid']
-                , 'job': output['job_name']
-                , 'buildNumber': output['build_name']}
+            params={'stageId': output['version']['stage_guid'],
+                    'job': output['job_name'],
+                    'buildNumber': output['build_name']}
         ).ok
-
-
-def capture_input():
-    with sys.stdin as standard_in:
-        request = json.load(standard_in)
-
-    return request
 
 
 def write_configuration(directory, source, configuration):
@@ -63,24 +39,21 @@ def process_in(directory=None):
 
     try:
         try:
-            request = capture_input()
+            request = common.capture_input()
         except json.decoder.JSONDecodeError:
             print('No configuration provided', file=sys.stderr)
             exit(1)
         else:
             try:
-                if 'version' in request and request['version'] is not None and 'stage_guid' in request['version']:
-                    version = request['version']['stage_guid']
-                else:
-                    version = None
-
+                version = common.extract_version(request)
                 source = request['source']
+
                 master = source['master']
                 pipeline_name = source['pipeline_name']
                 resource_name = source['resource_name']
                 team_name = source['team_name']
 
-                payload = call_spinnaker(source)
+                payload = common.call_spinnaker(source)
 
                 output = {}
 
@@ -143,7 +116,7 @@ def main(*args):
     else:
         directory = args[0]
 
-    signal.signal(signal.SIGALRM, handler)
+    signal.signal(signal.SIGALRM, common.handler)
 
     process_in(directory)
 

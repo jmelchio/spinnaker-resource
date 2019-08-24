@@ -413,8 +413,8 @@ concourse_check_without_baseurl = json.loads('''{ "source": { "app_name": "metri
 
 class TestCheck(unittest.TestCase):
 
-    @patch('assets.check.call_spinnaker', return_value=spinnaker_new_guid)
-    @patch('assets.check.capture_input', return_value=concourse_check_with_version)
+    @patch('assets.common.call_spinnaker', return_value=spinnaker_new_guid)
+    @patch('assets.common.capture_input', return_value=concourse_check_with_version)
     def test_unit_happy_path_new_version(self, call_spinnaker, capture_input):
         backup = sys.stdout
         sys.stdout = StringIO()
@@ -424,8 +424,8 @@ class TestCheck(unittest.TestCase):
         sys.stdout = backup
         self.assertEqual(out, '[{"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}]\n', 'No new version returned')
 
-    @patch('assets.check.call_spinnaker', return_value=spinnaker_multiple_values)
-    @patch('assets.check.capture_input', return_value=concourse_check_with_version)
+    @patch('assets.common.call_spinnaker', return_value=spinnaker_multiple_values)
+    @patch('assets.common.capture_input', return_value=concourse_check_with_version)
     def test_unit_happy_path_new_versions(self, call_spinnaker, capture_input):
         backup = sys.stdout
         sys.stdout = StringIO()
@@ -435,8 +435,8 @@ class TestCheck(unittest.TestCase):
         sys.stdout = backup
         self.assertEqual(out, '[{"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}]\n', 'No new version returned')
 
-    @patch('assets.check.call_spinnaker', return_value=spinnaker_new_guid)
-    @patch('assets.check.capture_input', return_value=concourse_check_without_version)
+    @patch('assets.common.call_spinnaker', return_value=spinnaker_new_guid)
+    @patch('assets.common.capture_input', return_value=concourse_check_without_version)
     def test_unit_happy_path_no_existing_version(self, call_spinnaker, capture_input):
         backup = sys.stdout
         sys.stdout = StringIO()
@@ -446,8 +446,8 @@ class TestCheck(unittest.TestCase):
         sys.stdout = backup
         self.assertEqual(out, '[{"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}]\n', 'No new version returned')
 
-    @patch('assets.check.call_spinnaker', return_value=spinnaker_new_guid)
-    @patch('assets.check.capture_input', return_value=concourse_check_no_version)
+    @patch('assets.common.call_spinnaker', return_value=spinnaker_new_guid)
+    @patch('assets.common.capture_input', return_value=concourse_check_no_version)
     def test_unit_happy_path_void_existing_version(self, call_spinnaker, capture_input):
         backup = sys.stdout
         sys.stdout = StringIO()
@@ -457,8 +457,8 @@ class TestCheck(unittest.TestCase):
         sys.stdout = backup
         self.assertEqual(out, '[{"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}]\n', 'No new version returned')
 
-    @patch('assets.check.call_spinnaker', return_value=spinnaker_empty_response)
-    @patch('assets.check.capture_input', return_value=concourse_check_without_version)
+    @patch('assets.common.call_spinnaker', return_value=spinnaker_empty_response)
+    @patch('assets.common.capture_input', return_value=concourse_check_without_version)
     def test_unit_happy_path_no_new_version(self, call_spinnaker, capture_input):
         backup = sys.stdout
         sys.stdout = StringIO()
@@ -468,8 +468,8 @@ class TestCheck(unittest.TestCase):
         sys.stdout = backup
         self.assertEqual(out, '[]\n', 'No empty list returned')
 
-    @patch('assets.check.call_spinnaker', return_value=spinnaker_no_id)
-    @patch('assets.check.capture_input', return_value=concourse_check_without_version)
+    @patch('assets.common.call_spinnaker', return_value=spinnaker_no_id)
+    @patch('assets.common.capture_input', return_value=concourse_check_without_version)
     def test_unit_crappy_path_missing_id(self, call_spinnaker, capture_input):
         backup = sys.stdout
         sys.stdout = StringIO()
@@ -479,8 +479,8 @@ class TestCheck(unittest.TestCase):
         sys.stdout = backup
         self.assertEqual(out, '[]\n', 'No empty list returned')
 
-    @patch('assets.check.call_spinnaker', return_value=spinnaker_multiple_values_with_bad_value)
-    @patch('assets.check.capture_input', return_value=concourse_check_with_version)
+    @patch('assets.common.call_spinnaker', return_value=spinnaker_multiple_values_with_bad_value)
+    @patch('assets.common.capture_input', return_value=concourse_check_with_version)
     def test_unit_crappy_path_new_versions_bad_id(self, call_spinnaker, capture_input):
         backup = sys.stdout
         sys.stdout = StringIO()
@@ -490,7 +490,7 @@ class TestCheck(unittest.TestCase):
         sys.stdout = backup
         self.assertEqual(out, '[{"stage_guid": "01D7N3NNCG0GBKK28RS25R4HX4"}]\n', 'No new version returned')
 
-    @patch('assets.check.capture_input', return_value=concourse_check_without_baseurl)
+    @patch('assets.common.capture_input', return_value=concourse_check_without_baseurl)
     def test_unit_crappy_path_missing_base_url(self, capture_input):
         backup = sys.stdout
         sys.stdout = StringIO()

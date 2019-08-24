@@ -306,8 +306,8 @@ concourse_in_without_baseurl = json.loads('''{ "source": { "app_name": "metricsd
 
 class TestIn(unittest.TestCase):
 
-    @patch('assets.inscript.call_spinnaker', return_value=spinnaker_waitforconcourse_running)
-    @patch('assets.inscript.capture_input', return_value=concourse_in_match_version)
+    @patch('assets.common.call_spinnaker', return_value=spinnaker_waitforconcourse_running)
+    @patch('assets.common.capture_input', return_value=concourse_in_match_version)
     @patch('assets.inscript.notify_spinnaker', return_value=True)
     def test_unit_happy_path(self, call_spinnaker, capture_input, notify_spinnaker):
         backup = sys.stdout
@@ -327,8 +327,8 @@ class TestIn(unittest.TestCase):
             self.assertEqual(contents, 'thing_one=one\nthing_two=two\n', 'String not found')
         os.remove('/tmp/file.props')
 
-    @patch('assets.inscript.call_spinnaker', return_value=spinnaker_multiple_values)
-    @patch('assets.inscript.capture_input', return_value=concourse_in_match_version_two)
+    @patch('assets.common.call_spinnaker', return_value=spinnaker_multiple_values)
+    @patch('assets.common.capture_input', return_value=concourse_in_match_version_two)
     @patch('assets.inscript.notify_spinnaker', return_value=True)
     def test_unit_happy_path_no_parameters(self, call_spinnaker, capture_input, notify_spinnaker):
         backup = sys.stdout
@@ -346,8 +346,8 @@ class TestIn(unittest.TestCase):
             self.assertEqual(contents, '', 'File not empty')
         os.remove('/tmp/file_two.props')
 
-    @patch('assets.inscript.call_spinnaker', return_value=spinnaker_waitforconcourse_completed)
-    @patch('assets.inscript.capture_input', return_value=concourse_in_match_version_three)
+    @patch('assets.common.call_spinnaker', return_value=spinnaker_waitforconcourse_completed)
+    @patch('assets.common.capture_input', return_value=concourse_in_match_version_three)
     @patch('assets.inscript.notify_spinnaker', return_value=True)
     def test_unit_crappy_path_no_running_wait_task(self, call_spinnaker, capture_input, notify_spinnaker):
         backup = sys.stderr
@@ -362,7 +362,7 @@ class TestIn(unittest.TestCase):
         self.assertEqual(str(context.exception), '1', 'Return code of `1` expected')
         self.assertEqual(err, 'No running Wait for Concourse task found\nSystem Exit detected\n')
 
-    @patch('assets.inscript.capture_input', return_value=concourse_in_without_baseurl)
+    @patch('assets.common.capture_input', return_value=concourse_in_without_baseurl)
     def test_unit_crappy_path_missing_base_url(self, capture_input):
         backup = sys.stderr
         sys.stderr = StringIO()

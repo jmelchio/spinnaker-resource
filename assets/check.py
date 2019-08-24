@@ -1,35 +1,10 @@
 #!/usr/bin/env python3
 
 import json
-import requests
 import signal
 import sys
 
-
-def handler(signum, frame):
-    print('Operation Timed Out', file=sys.stderr)
-    exit(signum)
-
-
-def call_spinnaker(source):
-    if 'user_name' in source and 'password' in source:
-        return requests.get(
-            source['base_url'] + 'applications/' + source['app_name'] + '/executions/search',
-            params={'statuses': 'RUNNING', 'expand': 'true'},
-            auth=(source['user_name'], source['password'])
-        ).json()
-    else:
-        return requests.get(
-            source['base_url'] + 'applications/' + source['app_name'] + '/executions/search',
-            params={'statuses': 'RUNNING', 'expand': 'true'}
-        ).json()
-
-
-def capture_input():
-    with sys.stdin as standard_in:
-        request = json.load(standard_in)
-
-    return request
+from assets import common
 
 
 def process_check():
@@ -37,18 +12,15 @@ def process_check():
 
     try:
         try:
-            request = capture_input()
+            request = common.capture_input()
         except json.decoder.JSONDecodeError:
             print('No configuration provided', file=sys.stderr)
             exit(1)
         else:
             try:
-                if 'version' in request and request['version'] is not None and 'stage_guid' in request['version']:
-                    version = request['version']['stage_guid']
-                else:
-                    version = None
-
+                version = common.extract_version(request)
                 source = request['source']
+
                 if 'master' in source:
                     master = source['master']
                 else:
@@ -57,7 +29,7 @@ def process_check():
                 resource_name = source['resource_name']
                 team_name = source['team_name']
 
-                payload = call_spinnaker(source)
+                payload = common.call_spinnaker(source)
 
                 version_list = []
 
@@ -90,7 +62,7 @@ def process_check():
 
 
 def main():
-    signal.signal(signal.SIGALRM, handler)
+    signal.signal(signal.SIGALRM, common.handler)
 
     process_check()
 
