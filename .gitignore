@@ -9,6 +9,9 @@ __pycache__/
 # Jetbrains IDE config
 .idea/
 
+# VSCode information
+.vscode
+
 # Distribution / packaging
 .Python
 build/
