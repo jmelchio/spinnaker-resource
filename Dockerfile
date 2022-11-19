@@ -1,4 +1,4 @@
-FROM python:3.7-alpine AS resource
+FROM python:3.10-alpine AS resource
 
 COPY ./requirements.txt /tmp/requirements.txt
 RUN pip3 install -r /tmp/requirements.txt
