@@ -13,10 +13,7 @@ def handler(signum, _frame):
 
 def capture_input():
     with sys.stdin as standard_in:
-        request = json.load(standard_in)
-
-    return request
-
+        return json.load(standard_in)
 
 def call_spinnaker(source):
     if 'user_name' in source and 'password' in source:
